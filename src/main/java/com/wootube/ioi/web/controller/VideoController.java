@@ -35,7 +35,7 @@ public class VideoController {
     }
 
     @PostMapping("/new")
-    public RedirectView video(MultipartFile uploadFile, VideoRequestDto videoRequestDto) throws IOException {
+    public RedirectView video(MultipartFile uploadFile, VideoRequestDto videoRequestDto) {
         UserSession userSession = userSessionManager.getUserSession();
         VideoResponseDto videoResponseDto = videoService.create(uploadFile, videoRequestDto, userSession.getId());
         return new RedirectView("/videos/" + videoResponseDto.getId());

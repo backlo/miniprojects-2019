@@ -9,6 +9,7 @@ import org.jcodec.api.JCodecException;
 import org.jcodec.common.DemuxerTrack;
 import org.jcodec.common.NIOUtils;
 import org.jcodec.common.SeekableByteChannel;
+import org.jcodec.common.SeekableDemuxerTrack;
 import org.jcodec.common.model.Picture;
 import org.jcodec.containers.mp4.demuxer.MP4Demuxer;
 import org.jcodec.scale.AWTUtil;
@@ -56,7 +57,7 @@ public class FileConverter {
         try {
             SeekableByteChannel byteChannel = NIOUtils.readableFileChannel(videoFile);
             MP4Demuxer demuxer = new MP4Demuxer(byteChannel);
-            DemuxerTrack track = demuxer.getVideoTrack();
+            SeekableDemuxerTrack track = demuxer.getVideoTrack();
             return track.getMeta().getTotalDuration() / 5.0;
         } catch (IOException e) {
             videoFile.delete();
