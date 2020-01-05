@@ -1,6 +1,6 @@
 # Wootube
 
-## Video 도메인
+## Video Domain
 
 * common field
     * ``Long id`` - 아이디(primary key)
@@ -17,13 +17,13 @@
     * ``User writer`` - 비디오 주인
         
 
-## Video 레퍼지토리
+## Video Repository
 
 * methods
     * ``findAllRandom`` : 비디오 파일을 메인화면이나 비디오 리스트 화면에서 랜덤으로 보여주는 리스트
     * ``findByWriter`` : 비디오 주인을 찾기 위한 기능
 
-## Video 서비스
+## Video Service
 
 * Create
     ```java
@@ -89,7 +89,7 @@
     ```
     * S3에 있는 비디오를 먼저 삭제 후 video 삭제
     
-## Video 유틸
+## S3 Uploader
 
 * S3UploadFileFactory.class
     ```java
@@ -180,14 +180,71 @@
         * 스칼라 resize를 통해 이미지 성능을 축소화 했다.
         * 추출하고 나면 BufferImage로 변경한다.
         
-### 아쉬웠던 점
-    * 썸네일 추출 할 때 한개가 아닌 다양한 개수를 뽑아서 보여주었으면 좋을 것 같다.
-    * 현재 확장자 명으로만 비디오 검증을 하고 있는데 이 방법은 보안에 취약하다 -> 악성파일이 확장자만 변경시켜 보낼 경우 거를 수 없음
-        * 따라서 파일 시그니처를 통해 검증을 하면 좋을 것 같다고 생각한다.
-    * 비디오 업로드 할 때 크기가 큰 파일일 경우 시간이 오래 걸린다는 단점이 있다.
-        * 비동기 처리로 알람을 띄우게 하면 좋을 것 같다.
-    * 크기가 큰 비디오를 부를 경우 시간이 오래 걸린다.
-        * 비디오 세그먼트로 나눠서 요청해 보면 어떨까? -> 대부분 미디어 서비스는 이와 같이 하는 것 같음
-        * 캐시로 저장시켜도 나쁘지 않다고 생각한다. -> 찾아봐야 될 것 같다. 
-     
+## Test Code
+* VideoServiceTest
+   ```java
+   @Test
+    @DisplayName("서비스에서 비디오를 저장한다.")
+    void create() throws IOException {
+        createMockVideo();
+
+        verify(modelMapper, atLeast(1)).map(testVideoRequestDto, Video.class);
+        verify(videoRepository, atLeast(1)).save(testVideo);
+    }
+
+    private void createMockVideo() throws IOException {
+        File convertedVideo = mock(File.class);
+        File convertedThumbnail = mock(File.class);
+
+        mockUploadVideo(convertedVideo, convertedThumbnail);
+
+        given(modelMapper.map(testVideoRequestDto, Video.class)).willReturn(testVideo);
+        given(userService.findByIdAndIsActiveTrue(USER_ID)).willReturn(writer);
+
+        videoService.create(testUploadMultipartFile, testVideoRequestDto, USER_ID);
+    }
+    ```
+    * Mock을 사용 -> 사용하는 이유? - [참고](http://egloos.zum.com/sakula99/v/2912503)
+    * given , when, then을 사용하여 테스트 검증
     
+* 인수 테스트
+    ```java
+    @Test
+    @DisplayName("비디오를 저장한다.")
+    void save() throws IOException {
+        File file = ResourceUtils.getFile("classpath:test_file.mp4");
+        byte[] fileContent = Files.readAllBytes(file.toPath());
+
+        MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
+        bodyBuilder.part("uploadFile", new ByteArrayResource(fileContent) {
+            @Override
+            public String getFilename() {
+                return "test_file.mp4";
+            }
+        }, MediaType.parseMediaType("video/mp4"));
+        bodyBuilder.part("title", "video_title");
+        bodyBuilder.part("description", "video_description");
+        bodyBuilder.part("writerId", 1);
+
+        requestWithBodyBuilder(bodyBuilder, POST, "/videos/new")
+                .expectStatus().isFound();
+        stopS3Mock();
+    }
+    ```
+    * 하나의 공통 컨트롤러 테스트를 만들어 AcceptanceTest와 비슷하게 인수테스트를 구현
+    * S3Mock을 사용해 S3에 간섭이 없도록 테스트를 구현 -> 테스트만 돌릴 수 있다.
+    * test를 위한 S3Mock Config Class를 만들어야 함
+      * config에는 8001번 포트로 S3Mock서버를 돌리며 프로덕션 설정에 있는 S3와 겹치지 않도록 primary로 설정
+        
+## 아쉬웠던 점
+
+* 썸네일 추출 할 때 한개가 아닌 다양한 개수를 뽑아서 보여주었으면 좋을 것 같다.
+* 현재 확장자 명으로만 비디오 검증을 하고 있는데 이 방법은 보안에 취약하다 -> 악성파일이 확장자만 변경시켜 보낼 경우 거를 수 없음
+   * 따라서 파일 시그니처를 통해 검증을 하면 좋을 것 같다고 생각한다.
+* 비디오 업로드 할 때 크기가 큰 파일일 경우 시간이 오래 걸린다는 단점이 있다.
+   * 비동기 처리로 알람을 띄우게 하면 좋을 것 같다.
+* 크기가 큰 비디오를 부를 경우 시간이 오래 걸린다.
+   * 비디오 세그먼트로 나눠서 요청해 보면 어떨까? -> 대부분 미디어 서비스는 이와 같이 하는 것 같음
+   * 캐시로 저장시켜도 나쁘지 않다고 생각한다. -> 찾아봐야 될 것 같다. 
+* 테스트에서 data.sql을 따로 만들지 않고 테스트를 할 수 있지 않았을까??
+   * 더 다양한 시도를 해봐야겠다.
