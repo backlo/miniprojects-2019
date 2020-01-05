@@ -1,4 +1,5 @@
 # Wootube
+* 전체적으로 비디오 기능에 대한 설명
 
 ## Video Domain
 
