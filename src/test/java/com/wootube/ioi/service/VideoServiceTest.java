@@ -122,8 +122,7 @@ class VideoServiceTest extends TestUtil {
         videoService.update(ID, testUploadMultipartFile, testVideoRequestDto, USER_ID);
 
         verify(testVideo).updateVideo(videoFileFullPath, convertedVideo.getName(), thumbnailImageFileFullPath, convertedThumbnail.getName());
-        verify(testVideo).updateTitle(testVideoRequestDto.getTitle());
-        verify(testVideo).updateDescription(testVideoRequestDto.getDescription());
+        verify(testVideo).updateVideo(testVideoRequestDto.getTitle(), testVideoRequestDto.getDescription());
     }
 
     @Test

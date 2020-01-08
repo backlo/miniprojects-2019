@@ -43,7 +43,7 @@ class VideoTest {
         testVideo.initialize("contentPath", "thumbnailPath", "originFileName.mp4", "thumbnailFileName.png", new User());
 
         Video updateTestVideo = new Video("update_title", "update_desc");
-        testVideo.update(updateTestVideo);
+        testVideo.updateVideo(updateTestVideo.getTitle(), updateTestVideo.getDescription());
 
         assertThat(testVideo.getTitle()).isEqualTo(updateTestVideo.getTitle());
         assertThat(testVideo.getDescription()).isEqualTo(updateTestVideo.getDescription());
