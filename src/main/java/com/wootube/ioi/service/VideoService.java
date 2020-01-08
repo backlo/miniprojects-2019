@@ -86,8 +86,7 @@ public class VideoService {
                     s3UploadFileFactory.getThumbnailUrl(), s3UploadFileFactory.getThumbnailFileName());
         }
 
-        video.updateTitle(videoRequestDto.getTitle());
-        video.updateDescription(videoRequestDto.getDescription());
+        video.updateVideo(videoRequestDto.getTitle(), videoRequestDto.getDescription());
     }
 
     @Transactional

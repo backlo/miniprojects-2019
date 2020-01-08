@@ -50,16 +50,8 @@ public class Video extends BaseEntity {
         this.description = description;
     }
 
-    public void update(Video updateVideo) {
-        this.title = updateVideo.title;
-        this.description = updateVideo.description;
-    }
-
-    public void updateTitle(String title) {
+    public void updateVideo(String title, String description) {
         this.title = title;
-    }
-
-    public void updateDescription(String description) {
         this.description = description;
     }
 
