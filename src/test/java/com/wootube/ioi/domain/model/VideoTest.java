@@ -1,5 +1,6 @@
 package com.wootube.ioi.domain.model;
 
+import com.wootube.ioi.service.dto.VideoS3ConverterDto;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,9 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class VideoTest {
+    private static final VideoS3ConverterDto videoS3ConverterDto = new VideoS3ConverterDto("contentPath",
+            "thumbnailPath",  "originFileName.mp4", "thumbnailFileName.png");
+
     private Validator validator;
 
     @BeforeEach
@@ -27,7 +31,7 @@ class VideoTest {
     @DisplayName("비디오 컨텐트 경로 및 오리지널 파일 이름 초기화 테스트")
     void initializeVideo() {
         Video testVideo = new Video("title", "description");
-        testVideo.initialize("contentPath", "thumbnailPath", "originFileName.mp4", "thumbnailFileName.png", new User());
+        testVideo.initialize(videoS3ConverterDto, new User());
         assertNoViolation(testVideo).isTrue();
     }
 
@@ -40,7 +44,7 @@ class VideoTest {
     @DisplayName("비디오 업데이트 테스트")
     void update() {
         Video testVideo = new Video("title", "description");
-        testVideo.initialize("contentPath", "thumbnailPath", "originFileName.mp4", "thumbnailFileName.png", new User());
+        testVideo.initialize(videoS3ConverterDto, new User());
 
         Video updateTestVideo = new Video("update_title", "update_desc");
         testVideo.updateVideo(updateTestVideo.getTitle(), updateTestVideo.getDescription());

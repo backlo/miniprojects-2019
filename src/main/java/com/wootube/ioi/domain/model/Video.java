@@ -1,5 +1,6 @@
 package com.wootube.ioi.domain.model;
 
+import com.wootube.ioi.service.dto.VideoS3ConverterDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -55,18 +56,18 @@ public class Video extends BaseEntity {
         this.description = description;
     }
 
-    public void updateVideo(String contentPath, String originFileName, String thumbnailPath, String thumbnailFileName) {
-        this.contentPath = contentPath;
-        this.originFileName = originFileName;
-        this.thumbnailPath = thumbnailPath;
-        this.thumbnailFileName = thumbnailFileName;
+    public void updateVideo(VideoS3ConverterDto videoS3ConverterDto) {
+        this.contentPath = videoS3ConverterDto.getContentPath();
+        this.originFileName = videoS3ConverterDto.getOriginFileName();
+        this.thumbnailPath = videoS3ConverterDto.getThumbnailPath();
+        this.thumbnailFileName = videoS3ConverterDto.getThumbnailFileName();
     }
 
-    public void initialize(String contentPath, String thumbnailPath, String originFileName, String thumbnailFileName, User writer) {
-        this.contentPath = contentPath;
-        this.thumbnailPath = thumbnailPath;
-        this.originFileName = originFileName;
-        this.thumbnailFileName = thumbnailFileName;
+    public void initialize(VideoS3ConverterDto videoS3ConverterDto, User writer) {
+        this.contentPath = videoS3ConverterDto.getContentPath();
+        this.originFileName = videoS3ConverterDto.getOriginFileName();
+        this.thumbnailPath = videoS3ConverterDto.getThumbnailPath();
+        this.thumbnailFileName = videoS3ConverterDto.getThumbnailFileName();
         this.writer = writer;
     }
 

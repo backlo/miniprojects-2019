@@ -14,8 +14,8 @@ public class S3UploadFileFactory {
     private final FileConverter fileConverter;
     private final FileUploader fileUploader;
 
-    private String videoUrl;
-    private String thumbnailUrl;
+    private String contentPath;
+    private String thumbnailPath;
     private String originFileName;
     private String thumbnailFileName;
 
@@ -30,8 +30,8 @@ public class S3UploadFileFactory {
 
         File convertedThumbnail = fileConverter.convert(convertedVideo);
 
-        videoUrl = fileUploader.uploadFile(convertedVideo, UploadType.VIDEO);
-        thumbnailUrl = fileUploader.uploadFile(convertedThumbnail, UploadType.THUMBNAIL);
+        contentPath = fileUploader.uploadFile(convertedVideo, UploadType.VIDEO);
+        thumbnailPath = fileUploader.uploadFile(convertedThumbnail, UploadType.THUMBNAIL);
 
         originFileName = convertedVideo.getName();
         thumbnailFileName = convertedThumbnail.getName();

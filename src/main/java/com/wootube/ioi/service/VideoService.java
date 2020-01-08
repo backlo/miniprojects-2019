@@ -7,6 +7,7 @@ import com.wootube.ioi.domain.model.Video;
 import com.wootube.ioi.domain.repository.VideoRepository;
 import com.wootube.ioi.service.dto.VideoRequestDto;
 import com.wootube.ioi.service.dto.VideoResponseDto;
+import com.wootube.ioi.service.dto.VideoS3ConverterDto;
 import com.wootube.ioi.service.exception.NotFoundVideoIdException;
 import com.wootube.ioi.service.exception.NotMatchUserIdException;
 import com.wootube.ioi.service.exception.UserAndWriterMisMatchException;
@@ -50,8 +51,7 @@ public class VideoService {
         User writer = userService.findByIdAndIsActiveTrue(writerId);
         Video video = modelMapper.map(videoRequestDto, Video.class);
 
-        video.initialize(s3UploadFileFactory.getVideoUrl(), s3UploadFileFactory.getThumbnailUrl(),
-                s3UploadFileFactory.getOriginFileName(), s3UploadFileFactory.getThumbnailFileName(), writer);
+        video.initialize(modelMapper.map(s3UploadFileFactory, VideoS3ConverterDto.class), writer);
         return modelMapper.map(videoRepository.save(video), VideoResponseDto.class);
     }
 
@@ -82,8 +82,7 @@ public class VideoService {
 
             S3UploadFileFactory s3UploadFileFactory = new S3UploadFileFactory(uploadFile, fileConverter, fileUploader).invoke();
 
-            video.updateVideo(s3UploadFileFactory.getVideoUrl(), s3UploadFileFactory.getOriginFileName(),
-                    s3UploadFileFactory.getThumbnailUrl(), s3UploadFileFactory.getThumbnailFileName());
+            video.updateVideo(modelMapper.map(s3UploadFileFactory, VideoS3ConverterDto.class));
         }
 
         video.updateVideo(videoRequestDto.getTitle(), videoRequestDto.getDescription());

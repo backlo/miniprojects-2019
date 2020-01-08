@@ -1,9 +1,11 @@
 package com.wootube.ioi.service;
 
+import com.wootube.ioi.domain.model.S3UploadFileFactory;
 import com.wootube.ioi.domain.model.User;
 import com.wootube.ioi.domain.model.Video;
 import com.wootube.ioi.domain.repository.VideoRepository;
 import com.wootube.ioi.service.dto.VideoRequestDto;
+import com.wootube.ioi.service.dto.VideoS3ConverterDto;
 import com.wootube.ioi.service.testutil.TestUtil;
 import com.wootube.ioi.service.util.FileConverter;
 import com.wootube.ioi.service.util.FileUploader;
@@ -118,10 +120,8 @@ class VideoServiceTest extends TestUtil {
         File convertedThumbnail = mock(File.class);
 
         mockUploadVideo(convertedVideo, convertedThumbnail);
-
         videoService.update(ID, testUploadMultipartFile, testVideoRequestDto, USER_ID);
 
-        verify(testVideo).updateVideo(videoFileFullPath, convertedVideo.getName(), thumbnailImageFileFullPath, convertedThumbnail.getName());
         verify(testVideo).updateVideo(testVideoRequestDto.getTitle(), testVideoRequestDto.getDescription());
     }
 
