@@ -4,19 +4,39 @@
 ## Video Domain
 
 * common field
-    * ``Long id`` - 아이디(primary key)
-    * ``Long createTime`` - 만들어진 시간
-    * ``Long updateTime`` - 수정한 시간
+    * ``Long id`` : 아이디(primary key)
+    * ``Long createTime`` : 만들어진 시간
+    * ``Long updateTime`` : 수정한 시간
 * video field
-    * ``String title`` - 비디오 제목
-    * ``String description`` - 비디오 설명
-    * ``String contentPath`` - S3에서 저장된 비디오 url
-    * ``String thumbnailPath`` - S3에서 저장된 썸네일 url
-    * ``String originFileName`` - 비디오 파일 이름
-    * ``String thumbnailFileName`` - 비디오 썸네일 이름
-    * ``Long views`` - 시청수
-    * ``User writer`` - 비디오 주인
-        
+    * ``title`` : 비디오 제목
+    	*  길이 50제한
+    * ``description`` : 비디오 설명
+    * ``contentPath`` : 비디오 S3 url 경로
+    * ``thumbnailPath`` : 비디오 썸네일 S3 url 경로
+    * ``contentFileName`` : 비디오 이름
+    * ``thumbnailFileName`` : 비디오 썸네일 이름
+    * ``views`` : 시청수
+    	*  columnDefinition -> BigInt 로 설정 및 default는 0
+    * ``writer`` : 소유자
+    	*  Lazy 페치 타입으로 설정
+    	*  다대일 단방향으로 설정 
+    	* 단방향으로 하는 이유??
+    
+    		```
+    		1. User가 Video를 알 필요가 없어서
+    		2. Video만 가지고 오고 싶은 경우 - fetch type을 Lazy로 만들고 dto를 만들어서 mapping 시켜줌(ModelMapper를 통해)
+    		3. Lazy로 해놓고 User를 부르면 에러가 남 - ByteBodyIntercepter(프록시 객체로 인해 진짜 객체를 가지고 올 수 없음)
+    		```
+    		
+    	* N+1문제?
+    		* 서로 다른 객체를 참조하는 Entity에서  findall을 할 경우 select문이 여러번 나간다. 즉 DB에 참조를 여러번 한다.
+    		* 테스트에서 한 트랜잭션 안에 save할 경우 1차 캐시에 저장이 되어 있어 findAll을 부를 경우 select문이 한번 나가 찾기가 어렵다.
+    		* 해결 방법
+    		
+    		```
+    		1. Join fetch를 걸어준다 (inner join) - JQL 사용해서
+    		2. EntityGraph를 사용한다 (outer join)
+    		```
 
 ## Video Repository
 
